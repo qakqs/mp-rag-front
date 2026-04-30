@@ -24,7 +24,6 @@ export default function RagUpload() {
 
   const fileInputRef = useRef(null)
 
-  // ---- load tags ----
   const loadTags = useCallback(() => {
     queryRagTagList()
       .then((res) => {
@@ -35,7 +34,6 @@ export default function RagUpload() {
 
   useEffect(() => { loadTags() }, [loadTags])
 
-  // ---- file selection ----
   const addFiles = useCallback(
     (incoming) => {
       const valid = incoming.filter((f) => {
@@ -52,7 +50,6 @@ export default function RagUpload() {
     setFiles((prev) => prev.filter((_, i) => i !== idx))
   }, [])
 
-  // ---- drag & drop ----
   const handleDrag = useCallback((e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -82,7 +79,6 @@ export default function RagUpload() {
     [addFiles],
   )
 
-  // ---- upload ----
   const handleUpload = useCallback(async () => {
     const tag = tagInput.trim()
     if (!tag || files.length === 0 || uploading) return
@@ -106,12 +102,12 @@ export default function RagUpload() {
   }, [tagInput, files, uploading, loadTags])
 
   return (
-    <div className="flex-1 flex divide-x divide-white/10 overflow-hidden">
+    <div className="flex-1 flex divide-x divide-pip-border overflow-hidden">
       {/* ====== Left: Upload ====== */}
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
         {/* ---- ragTag ---- */}
         <div>
-          <label className="block text-gray-300 text-sm font-medium mb-2">
+          <label className="block text-pip-text text-sm font-medium mb-2 pip-glow">
             知识库名称
           </label>
           <input
@@ -119,13 +115,13 @@ export default function RagUpload() {
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             placeholder="请输入知识库名称..."
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-gray-200 text-sm placeholder-gray-500 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30 transition-all"
+            className="w-full bg-pip-green-dim/10 border border-pip-border rounded-xl px-4 py-3 text-pip-text text-sm placeholder-pip-text-dim/50 outline-none focus:border-pip-green/50 focus:ring-1 focus:ring-pip-green/30 transition-all pip-input-glow"
           />
         </div>
 
         {/* ---- upload zone ---- */}
         <div>
-          <label className="block text-gray-300 text-sm font-medium mb-2">
+          <label className="block text-pip-text text-sm font-medium mb-2 pip-glow">
             上传文件
           </label>
           <div
@@ -136,22 +132,22 @@ export default function RagUpload() {
             onClick={() => fileInputRef.current?.click()}
             className={`relative border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
               dragOver
-                ? 'border-violet-400 bg-violet-500/10'
-                : 'border-white/10 hover:border-white/20 hover:bg-white/[0.02]'
+                ? 'border-pip-green bg-pip-green/10 pip-border-glow'
+                : 'border-pip-border hover:border-pip-green/40 hover:bg-pip-green-dim/10'
             }`}
           >
             <div className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-violet-600/20 flex items-center justify-center">
-                <svg className="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-2xl bg-pip-green/15 flex items-center justify-center">
+                <svg className="w-6 h-6 text-pip-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
               <div>
-                <p className="text-gray-300 text-sm font-medium">
-                  拖拽文件到此处，或<span className="text-violet-400">点击上传</span>
+                <p className="text-pip-text text-sm font-medium">
+                  拖拽文件到此处，或<span className="text-pip-green pip-glow">点击上传</span>
                 </p>
-                <p className="text-gray-500 text-xs mt-1">
+                <p className="text-pip-text-dim text-xs mt-1">
                   支持 .md、.txt、.sql 格式
                 </p>
               </div>
@@ -173,29 +169,29 @@ export default function RagUpload() {
         {/* ---- file list ---- */}
         {files.length > 0 && (
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
+            <label className="block text-pip-text text-sm font-medium mb-2 pip-glow">
               已选文件 ({files.length})
             </label>
             <div className="space-y-2">
               {files.map((f, i) => (
                 <div
                   key={`${f.name}-${f.size}-${i}`}
-                  className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 group"
+                  className="flex items-center gap-3 bg-pip-green-dim/20 border border-pip-border rounded-xl px-4 py-3 group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center shrink-0">
-                    <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 rounded-lg bg-pip-green/15 flex items-center justify-center shrink-0">
+                    <svg className="w-4 h-4 text-pip-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-200 text-sm truncate">{f.name}</p>
-                    <p className="text-gray-500 text-xs">{formatSize(f.size)}</p>
+                    <p className="text-pip-text text-sm truncate">{f.name}</p>
+                    <p className="text-pip-text-dim text-xs">{formatSize(f.size)}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => removeFile(i)}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition-colors opacity-0 group-hover:opacity-100"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-pip-text-dim hover:text-red-400 hover:bg-red-400/10 transition-colors opacity-0 group-hover:opacity-100"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -210,10 +206,10 @@ export default function RagUpload() {
         {/* ---- result ---- */}
         {result && (
           <div
-            className={`rounded-xl px-4 py-3 text-sm flex items-center gap-2 ${
+            className={`rounded-xl px-4 py-3 text-sm flex items-center gap-2 border ${
               result.type === 'success'
-                ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
-                : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                ? 'bg-pip-green/10 border-pip-green/30 text-pip-green'
+                : 'bg-red-500/10 border-red-500/20 text-red-400'
             }`}
           >
             {result.type === 'success' ? (
@@ -234,7 +230,7 @@ export default function RagUpload() {
           type="button"
           onClick={handleUpload}
           disabled={!tagInput.trim() || files.length === 0 || uploading}
-          className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-3 rounded-xl bg-pip-green hover:bg-[#00cc33] text-pip-bg font-medium text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 pip-glow"
         >
           {uploading ? (
             <>
@@ -258,8 +254,8 @@ export default function RagUpload() {
 
       {/* ====== Right: Knowledge Base List ====== */}
       <div className="w-56 shrink-0 overflow-y-auto px-4 py-6">
-        <h3 className="text-gray-300 text-sm font-medium mb-3 flex items-center gap-2">
-          <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h3 className="text-pip-text text-sm font-medium mb-3 flex items-center gap-2 pip-glow">
+          <svg className="w-4 h-4 text-pip-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
           </svg>
@@ -267,13 +263,13 @@ export default function RagUpload() {
         </h3>
 
         {tags.length === 0 ? (
-          <p className="text-gray-500 text-xs">暂无知识库</p>
+          <p className="text-pip-text-dim text-xs">暂无知识库</p>
         ) : (
           <div className="space-y-1">
             {tags.map((t) => (
               <div
                 key={t}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm text-gray-400"
+                className="w-full text-left px-3 py-2 rounded-lg text-sm text-pip-text-dim"
               >
                 {t}
               </div>

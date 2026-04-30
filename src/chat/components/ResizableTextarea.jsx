@@ -44,13 +44,13 @@ export default function ResizableTextarea({ value, onChange, onKeyDown, placehol
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         style={{ height: `${height}px` }}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-gray-200 text-sm placeholder-gray-500 resize-none outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30 transition-colors block"
+        className="w-full bg-pip-green-dim/10 border border-pip-border rounded-xl px-4 py-3 text-pip-text text-sm placeholder-pip-text-dim/50 resize-none outline-none focus:border-pip-green/50 focus:ring-1 focus:ring-pip-green/30 transition-colors block pip-input-glow"
       />
       <div
         onMouseDown={handleMouseDown}
         className="absolute top-0 right-3 -translate-y-1/2 w-10 h-5 cursor-ns-resize flex items-center justify-center group z-10"
       >
-        <div className="w-8 h-1.5 bg-white/30 rounded group-hover:bg-violet-400 transition-colors" />
+        <div className="w-8 h-1.5 bg-pip-text-dim rounded group-hover:bg-pip-green transition-colors" />
       </div>
     </div>
   )

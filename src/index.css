@@ -1,5 +1,144 @@
 @import "tailwindcss";
 
+@theme {
+  --color-pip-bg: #121a0e;
+  --color-pip-panel: #192615;
+  --color-pip-green: #00ff41;
+  --color-pip-green-dim: #0f3d10;
+  --color-pip-border: #206020;
+  --color-pip-text: #00ff41;
+  --color-pip-text-dim: #3a7a3a;
+  --color-pip-amber: #9aac3a;
+  --font-pip: "Consolas", "Courier New", "SF Mono", "Fira Code", monospace;
+}
+
+body {
+  font-family: var(--font-pip);
+  letter-spacing: 0.02em;
+  background: #121a0e;
+}
+
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #4a4a5a; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #152015; }
+::-webkit-scrollbar-thumb { background: #2d6a2d; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3d8a3d; }
+
+/* ====== Pip-Boy CRT keyframes ====== */
+
+@keyframes crt-glow-pulse {
+  0%, 100% { text-shadow: 0 0 6px rgba(0, 255, 65, 0.5), 0 0 14px rgba(0, 255, 65, 0.2); }
+  50%      { text-shadow: 0 0 10px rgba(0, 255, 65, 0.7), 0 0 22px rgba(0, 255, 65, 0.35); }
+}
+
+@keyframes crt-jitter {
+  0%, 100% { transform: translateX(0); }
+  25%  { transform: translateX(0.5px); }
+  50%  { transform: translateX(-0.5px); }
+  75%  { transform: translateX(0.3px); }
+}
+
+@keyframes crt-glitch {
+  0%   { transform: translateX(0); opacity: 1; }
+  20%  { transform: translateX(-3px); opacity: 0.8; }
+  40%  { transform: translateX(3px); opacity: 0.9; }
+  60%  { transform: translateX(-1px); opacity: 1; }
+  80%  { transform: translateX(1px); opacity: 0.85; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* power-on: bright line sweeps from top to bottom */
+@keyframes crt-power-on-line {
+  0%   { top: 0; height: 4px; opacity: 1; background: #fff; }
+  20%  { top: 30%; height: 3px; opacity: 0.95; background: #ccffcc; }
+  50%  { top: 55%; height: 2px; opacity: 0.9; background: #00ff41; }
+  80%  { top: 85%; height: 1px; opacity: 0.7; background: #00cc33; }
+  100% { top: 100%; height: 0; opacity: 0; background: #008822; }
+}
+
+/* power-on: screen opens vertically from center line */
+@keyframes crt-power-on-open {
+  0%   { clip-path: inset(50% 0 50% 0); }
+  40%  { clip-path: inset(45% 0 45% 0); }
+  70%  { clip-path: inset(15% 0 15% 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+/* power-on: flicker to life */
+@keyframes crt-flicker-in {
+  0%   { opacity: 0; }
+  5%   { opacity: 0.9; }
+  10%  { opacity: 0.2; }
+  15%  { opacity: 0.8; }
+  20%  { opacity: 0.1; }
+  25%  { opacity: 0.7; }
+  30%  { opacity: 0.3; }
+  35%  { opacity: 0.9; }
+  40%  { opacity: 0.2; }
+  45%  { opacity: 0.6; }
+  50%  { opacity: 0.4; }
+  55%  { opacity: 0.95; }
+  60%  { opacity: 0.3; }
+  65%  { opacity: 0.7; }
+  70%  { opacity: 0.5; }
+  75%  { opacity: 0.9; }
+  80%  { opacity: 0.4; }
+  85%  { opacity: 0.75; }
+  90%  { opacity: 0.55; }
+  95%  { opacity: 0.92; }
+  100% { opacity: 1; }
+}
+
+/* ====== CRT overlay classes ====== */
+
+/* power-on: bright horizontal line sweeps down */
+.crt-power-on-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  animation: crt-power-on-line 0.5s ease-in forwards;
+}
+
+/* power-on: screen expands open */
+.crt-power-on-open {
+  animation: crt-power-on-open 0.45s ease-out 0.5s forwards;
+}
+
+/* power-on: flicker after opening */
+.crt-flicker-in {
+  animation: crt-flicker-in 0.7s steps(1) 0.95s forwards;
+}
+
+/* recurring jitter */
+.crt-jitter {
+  animation: crt-jitter 0.1s ease-in-out infinite;
+}
+
+/* ====== utility classes (used via Tailwind) ====== */
+
+.animate-glow-pulse {
+  animation: crt-glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-glitch {
+  animation: crt-glitch 0.3s steps(1);
+}
+
+.pip-glow {
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.6), 0 0 18px rgba(0, 255, 65, 0.3);
+}
+
+.pip-box-glow {
+  box-shadow: 0 0 16px rgba(0, 255, 65, 0.12), inset 0 0 30px rgba(0, 255, 65, 0.04);
+}
+
+.pip-border-glow {
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.2);
+}
+
+.pip-input-glow:focus {
+  box-shadow: 0 0 14px rgba(0, 255, 65, 0.25), 0 0 4px rgba(0, 255, 65, 0.5);
+}
+
+/* bounce animation delays */
+.bounce-delay-1 { animation-delay: 0.15s; }
+.bounce-delay-2 { animation-delay: 0.3s; }

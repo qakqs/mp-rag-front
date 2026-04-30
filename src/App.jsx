@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Chat from './chat/Chat'
 import RagUpload from './rag/RagUpload'
+import CrtOverlay from './rag/components/CrtOverlay'
 
 const TABS = [
   { key: 'chat', label: 'AI 对话', icon: ChatIcon },
@@ -9,24 +10,34 @@ const TABS = [
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('chat')
+  const [glitch, setGlitch] = useState(false)
+
+  const switchTab = useCallback((key) => {
+    if (key === activeTab) return
+    setGlitch(true)
+    setActiveTab(key)
+    setTimeout(() => setGlitch(false), 300)
+  }, [activeTab])
 
   return (
-    <div className="h-dvh bg-[#1e1e2e] flex items-center justify-center sm:p-4">
-      <div className="w-full h-full sm:max-w-4xl sm:h-[90vh] bg-[#2a2a3c] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="h-dvh bg-pip-bg flex items-center justify-center sm:p-4">
+      <CrtOverlay />
+
+      <div className={`w-full h-full sm:max-w-6xl sm:h-[90vh] bg-pip-panel sm:rounded-2xl pip-box-glow flex flex-col overflow-hidden border border-pip-border ${glitch ? 'animate-glitch' : ''}`}>
 
         {/* Header with tabs */}
-        <header className="px-6 py-4 border-b border-white/10 flex items-center gap-1 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-white text-sm font-bold mr-3">
+        <header className="px-6 py-4 border-b border-pip-border flex items-center gap-1 shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-pip-green flex items-center justify-center text-pip-bg text-sm font-bold mr-3 animate-glow-pulse">
             AI
           </div>
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              onClick={() => switchTab(key)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
                 activeTab === key
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                  ? 'bg-pip-green-dim text-pip-green pip-glow'
+                  : 'text-pip-text-dim hover:text-pip-text hover:bg-pip-green-dim/50'
               }`}
             >
               <Icon />
