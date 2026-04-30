@@ -69,22 +69,10 @@ export default function Chat() {
 
   // ---- render ----
   return (
-    <div className="h-dvh bg-[#1e1e2e] flex items-center justify-center sm:p-4">
-      <div className="w-full h-full sm:max-w-4xl sm:h-[90vh] bg-[#2a2a3c] sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <>
 
-        {/* Header */}
-        <header className="px-6 py-4 border-b border-white/10 flex items-center gap-3 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-white text-sm font-bold">
-            AI
-          </div>
-          <div>
-            <h1 className="text-white font-semibold text-sm">AI 助手</h1>
-            <p className="text-gray-400 text-xs">在线</p>
-          </div>
-        </header>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {messages.map((msg, i) => (
             <ChatMessage key={i} role={msg.role} content={msg.content} />
           ))}
@@ -140,7 +128,6 @@ export default function Chat() {
           </p>
         </div>
 
-      </div>
-    </div>
+    </>
   )
 }
