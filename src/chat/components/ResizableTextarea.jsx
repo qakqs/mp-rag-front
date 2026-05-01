@@ -1,22 +1,18 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 
-export default function ResizableTextarea({ value, onChange, onKeyDown, placeholder, inputRef }) {
-  const textareaRef = useRef(null)
+export default function ResizableTextarea({ value, onChange, onKeyDown, placeholder, textareaRef }) {
+  const taRef = useRef(null)
   const [height, setHeight] = useState(MIN_HEIGHT)
   const dragging = useRef(false)
   const startY = useRef(0)
   const startHeight = useRef(0)
-
-  useEffect(() => {
-    if (inputRef) inputRef.current = textareaRef.current
-  }, [inputRef])
 
   const handleMouseDown = (e) => {
     e.preventDefault()
     e.stopPropagation()
     dragging.current = true
     startY.current = e.clientY
-    startHeight.current = textareaRef.current?.offsetHeight || height
+    startHeight.current = taRef.current?.offsetHeight || height
 
     const onMouseMove = (e) => {
       if (!dragging.current) return
@@ -37,7 +33,10 @@ export default function ResizableTextarea({ value, onChange, onKeyDown, placehol
   return (
     <div className="flex-1 relative">
       <textarea
-        ref={textareaRef}
+        ref={(n) => {
+          taRef.current = n
+          if (textareaRef) textareaRef.current = n
+        }}
         rows={1}
         value={value}
         onChange={(e) => onChange(e.target.value)}

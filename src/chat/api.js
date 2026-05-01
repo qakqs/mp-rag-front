@@ -1,33 +1,19 @@
-const BASE_URL = 'http://127.0.0.1:8092'
-const MODEL = 'gpt-oss:120b-cloud'
+import { BASE_URL } from '../config.js'
 
-function extractContent(item) {
-  return (
-    item?.result?.output?.content ||
-    item?.results?.[0]?.output?.content ||
-    ''
-  )
-}
+const MODEL = 'gpt-oss:120b-cloud'
+const extractContent = (i) => i?.result?.output?.content || i?.results?.[0]?.output?.content || ''
 
 export async function* streamChat(message) {
-  const response = await fetch(`${BASE_URL}/api/v1/ollama/generateStream`, {
+  const res = await fetch(`${BASE_URL}/api/v1/ollama/generateStream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: MODEL, message }),
   })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`)
-  }
-
-  const raw = await response.text()
-  const parsed = JSON.parse(raw)
-  const items = Array.isArray(parsed) ? parsed : [parsed]
-
+  const items = [].concat(JSON.parse(await res.text()))
   for (const item of items) {
-    const content = extractContent(item)
-    if (content) {
-      yield content
-    }
+    const c = extractContent(item)
+    if (c) yield c
   }
 }

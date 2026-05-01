@@ -3,7 +3,10 @@ import ChatMessage from './components/ChatMessage'
 import ResizableTextarea from './components/ResizableTextarea'
 import { streamChat } from './api'
 
-const WELCOME_MSG = { role: 'assistant', content: '你好，有什么可以帮你的？' }
+const WELCOME_MSG = {
+  role: 'assistant',
+  content: 'Vault-Tec 终端系统已就绪。有什么可以帮你的，监督者？',
+}
 
 export default function Chat() {
   const [messages, setMessages] = useState([WELCOME_MSG])
@@ -12,47 +15,40 @@ export default function Chat() {
   const [isStreaming, setIsStreaming] = useState(false)
 
   const messagesEndRef = useRef(null)
-  const inputRef = useRef(null)
-
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+  const textareaRef = useRef(null)
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages, streaming, scrollToBottom])
+    messagesEndRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' })
+  }, [messages, streaming, isStreaming])
 
   const handleSend = useCallback(async () => {
-    const text = input.trim()
+    const text = textareaRef.current?.value?.trim()
     if (!text || isStreaming) return
 
-    setMessages((prev) => [...prev, { role: 'user', content: text }])
+    const userMsg = { role: 'user', content: text }
+    setMessages((prev) => [...prev, userMsg])
     setInput('')
     setIsStreaming(true)
     setStreaming('')
 
     let fullContent = ''
-
     try {
       for await (const chunk of streamChat(text)) {
         fullContent += chunk
         setStreaming(fullContent)
-        await new Promise((r) => setTimeout(r, 20))
       }
-
       setMessages((prev) => [...prev, { role: 'assistant', content: fullContent }])
-      setStreaming('')
-      setIsStreaming(false)
-      inputRef.current?.focus()
     } catch {
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: fullContent || '请求失败，请重试。' },
       ])
+    } finally {
       setStreaming('')
       setIsStreaming(false)
+      textareaRef.current?.focus()
     }
-  }, [input, isStreaming])
+  }, [isStreaming])
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -66,39 +62,20 @@ export default function Chat() {
 
   return (
     <>
-
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         {messages.map((msg, i) => (
           <ChatMessage key={i} role={msg.role} content={msg.content} />
         ))}
-        {isStreaming && streaming && (
-          <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-lg bg-pip-green flex items-center justify-center text-pip-bg text-xs font-bold shrink-0 mt-0.5 animate-glow-pulse">
-              AI
-            </div>
-            <div className="bg-pip-green-dim/30 rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed max-w-[85%]">
-              <span className="text-pip-text whitespace-pre-wrap">{streaming}</span>
-              <span className="inline-block w-2 h-[14px] bg-pip-green ml-0.5 align-middle animate-pulse" />
-            </div>
-          </div>
-        )}
-        {isStreaming && !streaming && (
-          <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-lg bg-pip-green flex items-center justify-center text-pip-bg text-xs font-bold shrink-0 mt-0.5 animate-glow-pulse">
-              AI
-            </div>
-            <div className="bg-pip-green-dim/30 rounded-2xl rounded-tl-sm px-4 py-3">
-              <span className="inline-block w-2 h-2 bg-pip-green rounded-full animate-bounce mr-1" />
-              <span className="inline-block w-2 h-2 bg-pip-green rounded-full animate-bounce mr-1 bounce-delay-1" />
-              <span className="inline-block w-2 h-2 bg-pip-green rounded-full animate-bounce bounce-delay-2" />
-            </div>
-          </div>
+        {isStreaming && (
+          <ChatMessage
+            role="assistant"
+            content={streaming}
+            isStreaming
+          />
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="px-6 py-4 border-t border-pip-border shrink-0">
         <div className="flex gap-3 items-end">
           <ResizableTextarea
@@ -106,7 +83,7 @@ export default function Chat() {
             onChange={setInput}
             onKeyDown={handleKeyDown}
             placeholder="输入消息..."
-            inputRef={inputRef}
+            textareaRef={textareaRef}
           />
           <button
             onClick={handleSend}
@@ -123,7 +100,6 @@ export default function Chat() {
           Enter 发送，Shift+Enter 换行
         </p>
       </div>
-
     </>
   )
 }

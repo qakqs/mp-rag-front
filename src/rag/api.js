@@ -1,20 +1,23 @@
-const BASE_URL = 'http://127.0.0.1:8092'
+import { BASE_URL } from '../config.js'
 
-export async function queryRagTagList() {
-  const res = await fetch(`${BASE_URL}/api/v1/rag/queryRagTagList`, { method: 'POST' })
+async function post(path, body, headers) {
+  const res = await fetch(`${BASE_URL}${path}`, { method: 'POST', headers, body })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return res.json()
 }
 
-export async function uploadFiles(ragTag, files) {
-  const formData = new FormData()
-  formData.append('ragTag', ragTag)
-  files.forEach((f) => formData.append('files', f))
+export const queryRagTagList = () => post('/api/v1/rag/queryRagTagList')
 
-  const res = await fetch(`${BASE_URL}/api/v1/rag/file/upload`, {
-    method: 'POST',
-    body: formData,
+export async function uploadFiles(ragTag, files) {
+  const fd = new FormData()
+  fd.append('ragTag', ragTag)
+  files.forEach((f) => fd.append('files', f))
+  return post('/api/v1/rag/file/upload', fd)
+}
+
+export async function analyzeGitRepository(repoUrl, userName, token) {
+  const body = new URLSearchParams({ repoUrl, userName, token })
+  return post('/api/v1/rag/analyzeGitRepository', body.toString(), {
+    'Content-Type': 'application/x-www-form-urlencoded',
   })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  return res.json()
 }
