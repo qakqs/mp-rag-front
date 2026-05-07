@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import ChatMessage from './components/ChatMessage'
 import ResizableTextarea from './components/ResizableTextarea'
 import { streamChat } from './api'
+import { queryRagTagList } from '../rag/api'
 
 const WELCOME_MSG = {
   role: 'assistant',
@@ -13,9 +14,19 @@ export default function Chat() {
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
+  const [ragTag, setRagTag] = useState('')
+  const [tags, setTags] = useState([])
 
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
+
+  useEffect(() => {
+    queryRagTagList()
+      .then((res) => {
+        if (res?.code === '0000' && Array.isArray(res.data)) setTags(res.data)
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: isStreaming ? 'auto' : 'smooth' })
@@ -33,7 +44,7 @@ export default function Chat() {
 
     let fullContent = ''
     try {
-      for await (const chunk of streamChat(text)) {
+      for await (const chunk of streamChat(text, ragTag)) {
         fullContent += chunk
         setStreaming(fullContent)
       }
@@ -48,7 +59,7 @@ export default function Chat() {
       setIsStreaming(false)
       textareaRef.current?.focus()
     }
-  }, [isStreaming])
+  }, [isStreaming, ragTag])
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -77,6 +88,18 @@ export default function Chat() {
       </div>
 
       <div className="px-6 py-4 border-t border-pip-border shrink-0">
+        <div className="flex gap-2 items-end mb-3">
+          <select
+            value={ragTag}
+            onChange={(e) => setRagTag(e.target.value)}
+            className="bg-pip-green-dim/10 border border-pip-border rounded-xl px-3 py-2 text-pip-text text-xs outline-none focus:border-pip-green/50 transition-all pip-input-glow"
+          >
+            <option value="">通用对话（无知识库）</option>
+            {tags.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
         <div className="flex gap-3 items-end">
           <ResizableTextarea
             value={input}

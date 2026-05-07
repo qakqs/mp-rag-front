@@ -1,19 +1,28 @@
 import { BASE_URL } from '../config.js'
 
-const MODEL = 'gpt-oss:120b-cloud'
-const extractContent = (i) => i?.result?.output?.content || i?.results?.[0]?.output?.content || ''
+export async function* streamChat(message, ragTag) {
+  const body = { message }
+  if (ragTag) body.ragTag = ragTag
 
-export async function* streamChat(message) {
-  const res = await fetch(`${BASE_URL}/api/v1/ollama/generateStream`, {
+  const res = await fetch(`${BASE_URL}/api/v1/anthropic/generate_stream_rag`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: MODEL, message }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
 
-  const items = [].concat(JSON.parse(await res.text()))
+  const text = await res.text()
+  let data
+  try {
+    data = JSON.parse(text)
+  } catch {
+    throw new Error('响应解析失败')
+  }
+
+  const items = Array.isArray(data) ? data : [data]
   for (const item of items) {
-    const c = extractContent(item)
-    if (c) yield c
+    const content = item?.results?.[0]?.output?.text
+      || item?.result?.output?.text
+    if (content) yield content
   }
 }
